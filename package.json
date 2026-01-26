@@ -39,7 +39,7 @@
 		"@react-email/components": "^0.0.26",
 		"@react-email/html": "^0.0.10",
 		"@react-email/tailwind": "^1.0.0",
-		"argon2": "^0.41.1",
+		"argon2": "^0.44.0",
 		"class-transformer": "^0.5.1",
 		"class-validator": "^0.14.1",
 		"connect-redis": "^7.1.1",
