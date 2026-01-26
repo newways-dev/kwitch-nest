@@ -3,11 +3,15 @@ import { hash, verify } from 'argon2'
 
 import { PrismaService } from '@/src/core/prisma/prisma.service'
 
+import { VerificationService } from './../verification/verification.service'
 import { CreateUserInput } from './inputs/create-user.input'
 
 @Injectable()
 export class AccountService {
-	public constructor(private readonly prismaService: PrismaService) {}
+	public constructor(
+		private readonly prismaService: PrismaService,
+		private readonly verificationService: VerificationService
+	) {}
 
 	public async me(id: string) {
 		const user = await this.prismaService.user.findUnique({
@@ -42,7 +46,7 @@ export class AccountService {
 			throw new ConflictException('Эта почта уже занята')
 		}
 
-		await this.prismaService.user.create({
+		const user = await this.prismaService.user.create({
 			data: {
 				username,
 				email,
@@ -51,12 +55,8 @@ export class AccountService {
 			}
 		})
 
+		await this.verificationService.sendVerificationToken(user)
+
 		return true
-	}
-
-	public async findAll() {
-		const users = await this.prismaService.user.findMany()
-
-		return users
 	}
 }
