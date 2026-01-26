@@ -1,4 +1,5 @@
 import {
+	BadRequestException,
 	ConflictException,
 	Injectable,
 	InternalServerErrorException,
@@ -14,6 +15,8 @@ import { RedisService } from '@/src/core/redis/redis.service'
 import { getSessionMetadata } from '@/src/shared/utils/session-metadata.util'
 import { destroySession, saveSession } from '@/src/shared/utils/session.util'
 
+import { VerificationService } from '../verification/verification.service'
+
 import { LoginInput } from './inputs/login.input'
 
 @Injectable()
@@ -21,7 +24,8 @@ export class SessionService {
 	public constructor(
 		private readonly prismaService: PrismaService,
 		private readonly redisService: RedisService,
-		private readonly configService: ConfigService
+		private readonly configService: ConfigService,
+		private readonly verificationService: VerificationService
 	) {}
 
 	public async findByUser(req: Request) {
@@ -90,6 +94,13 @@ export class SessionService {
 
 		if (!isValidPassword) {
 			throw new UnauthorizedException('Неверный пароль')
+		}
+
+		if (!user.isEmailVerified) {
+			await this.verificationService.sendVerificationToken(user)
+			throw new BadRequestException(
+				'Аккаунт не верифицирован. Пожалуйста, проверьте свою почту для подтверждения'
+			)
 		}
 
 		const metadata = getSessionMetadata(req, userAgent)
