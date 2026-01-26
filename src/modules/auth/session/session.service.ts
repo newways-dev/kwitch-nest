@@ -11,6 +11,7 @@ import type { Request } from 'express'
 
 import { PrismaService } from '@/src/core/prisma/prisma.service'
 import { RedisService } from '@/src/core/redis/redis.service'
+import { getSessionMetadata } from '@/src/shared/utils/session-metadata.util'
 
 import { LoginInput } from './inputs/login.input'
 
@@ -22,7 +23,7 @@ export class SessionService {
 		private readonly configService: ConfigService
 	) {}
 
-	public async login(req: Request, input: LoginInput) {
+	public async login(req: Request, input: LoginInput, userAgent: string) {
 		const { login, password, pin } = input
 
 		const user = await this.prismaService.user.findFirst({
@@ -44,9 +45,12 @@ export class SessionService {
 			throw new UnauthorizedException('Неверный пароль')
 		}
 
+		const metadata = getSessionMetadata(req, userAgent)
+
 		return new Promise((resolve, reject) => {
 			req.session.createdAt = new Date()
 			req.session.userId = user.id
+			req.session.metadata = metadata
 			req.session.save(err => {
 				if (err) {
 					return reject(
