@@ -2,13 +2,13 @@ import {
 	BadRequestException,
 	ConflictException,
 	Injectable,
-	InternalServerErrorException,
 	NotFoundException,
 	UnauthorizedException
 } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { verify } from 'argon2'
 import type { Request } from 'express'
+import { TOTP } from 'otpauth'
 
 import { PrismaService } from '@/src/core/prisma/prisma.service'
 import { RedisService } from '@/src/core/redis/redis.service'
@@ -101,6 +101,28 @@ export class SessionService {
 			throw new BadRequestException(
 				'Аккаунт не верифицирован. Пожалуйста, проверьте свою почту для подтверждения'
 			)
+		}
+
+		if (user.isTotpEnabled) {
+			if (!pin) {
+				return {
+					message: 'Необходим код для завершения авторизации'
+				}
+			}
+
+			const totp = new TOTP({
+				issuer: 'TeaStream',
+				label: `${user.email}`,
+				algorithm: 'SHA1',
+				digits: 6,
+				secret: user.totpSecret
+			})
+
+			const delta = totp.validate({ token: pin })
+
+			if (delta === null) {
+				throw new BadRequestException('Неверный код')
+			}
 		}
 
 		const metadata = getSessionMetadata(req, userAgent)
