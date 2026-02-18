@@ -12,12 +12,10 @@ export class CronService {
 		private readonly mailService: MailService
 	) {}
 
-	// @Cron('*/10 * * * * *')
-	// @Cron(CronExpression.EVERY_10_SECONDS)
 	@Cron('0 0 * * * *')
 	public async deleteDeactivatedAccounts() {
 		const sevenDaysAgo = new Date()
-		sevenDaysAgo.setDate(sevenDaysAgo.getSeconds() - 7)
+		sevenDaysAgo.setDate(sevenDaysAgo.getDay() - 7)
 
 		const deactivatedAccounts = await this.prismaService.user.findMany({
 			where: {
