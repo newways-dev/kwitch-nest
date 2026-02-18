@@ -1,37 +1,40 @@
+import type { SessionMetadata } from '@/src/shared/types/session-metadata.types'
 import { Body, Head, Heading, Link, Preview, Section, Tailwind, Text } from '@react-email/components'
 import { Html } from '@react-email/html'
 import * as React from 'react'
 
-import type { SessionMetadata } from '@/src/shared/types/session-metadata.types'
-
-interface PasswordRecoveryTemplateProps {
-	domain: string
+interface DeactivateTemplateProps {
 	token: string
 	metadata: SessionMetadata
 }
 
-export function PasswordRecoveryTemplate({ domain, token, metadata }: PasswordRecoveryTemplateProps) {
-	const resetLink = `${domain}/account/recovery/${token}`
-
+export function DeactivateTemplate({ token, metadata }: DeactivateTemplateProps) {
+	
 	return (
 		<Html>
-			<Head />
-			<Preview>Сброс пароля</Preview>
+		<Head />
+			<Preview>Деактивация аккаунта</Preview>
 			<Tailwind>
 				<Body className='max-w-2xl mx-auto p-6 bg-slate-50'>
 					<Section className='text-center mb-8'>
 						<Heading className='text-3xl text-black font-bold'>
-							Сброс пароля
+							Запрос на деактивацию аккаунта
 						</Heading>
 						<Text className="text-black text-base mt-2">
-							Вы запросили сброс пароля для вашей учетной записи.
+							Вы инициировали процесс деактивации вашего аккаунта на платформе <b>Kwitch</b>.
 						</Text>
-						<Text className="text-black text-base mt-2">
-							Чтобы создать новый пароль, нажмите на ссылку ниже:
+					</Section>
+
+					<Section className='bg-gray-100 rounded-lg p-6 text-center mb-6'>
+						<Heading className='text-2xl text-black font-semibold'>
+							Код подтверждения:
+						</Heading>
+						<Heading className='text-3xl text-black font-semibold'>
+							{token}
+						</Heading>
+						<Text className='text-black'>
+							Этот код действителен в течение 5 минут.
 						</Text>
-						<Link href={resetLink} className='inline-flex justify-center items-center rounded-full text-sm font-medium text-white bg-[#18B9AE] px-5 py-2'>
-							Сбросить пароль
-						</Link>
 					</Section>
 
 					<Section className='bg-gray-100 rounded-lg p-6 mb-6'>
@@ -67,3 +70,6 @@ export function PasswordRecoveryTemplate({ domain, token, metadata }: PasswordRe
 		</Html>
 	)
 }
+
+
+

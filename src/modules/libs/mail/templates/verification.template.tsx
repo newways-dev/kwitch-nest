@@ -32,7 +32,7 @@ export function VerificationTemplate({ domain, token }: VerificationTemplateProp
 						<Text className='text-gray-600'>
 							Если у вас есть вопросы или вы столкнулись с трудностями, не стесняйтесь обращаться в нашу службу поддержки по адресу{' '}
 							<Link 
-								href="mailto:help@teastream.ru" 
+								href="mailto:help@kwitch.com" 
 								className="text-[#18b9ae] underline"
 							>
 								help@kwitch.com
